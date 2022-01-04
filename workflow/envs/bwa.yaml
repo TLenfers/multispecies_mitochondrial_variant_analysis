@@ -1,4 +1,4 @@
 channels:
   - bioconda
 dependencies:
-  - snakemake=5.19.0-0
+  -  bwa==0.7.17
