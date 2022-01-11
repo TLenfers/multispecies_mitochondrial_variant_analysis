@@ -1,1 +1,1 @@
-# mitochondrial_dog_analysis
+# multispecies_mitochondrial_variant_calling
