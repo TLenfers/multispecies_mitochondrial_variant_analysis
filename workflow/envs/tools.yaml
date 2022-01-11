@@ -1,5 +1,5 @@
 channels:
   - bioconda
 dependencies:
-  -  bwa==0.7.17
+  - bcftools=1.14
   - samtools=1.14
