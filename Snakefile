@@ -10,70 +10,98 @@ configfile: "config/config.yaml"
 
 rule all:
     input:
-        expand("calls/{sample}.vcf",sample=config["samples"])   
+        expand("results/calls_bcftools/{reference}/{sample}.vcf",sample=config["samples"],reference=config["reference"])   
 
-rule create_idx:
+rule bwa_idx:
     input:
-        ref=expand("data/reference/{reference}.fa", reference=config["reference"])
+        "data/reference/{reference}.fa" 
     output:
-         "{input.ref}.amb", "{input.ref}.ann", "{input.ref}.bwt", "{input.ref}.pac", "{input.ref}.sa"
+        "data/reference/{reference}.fa.amb", 
+        "data/reference/{reference}.fa.ann", 
+        "data/reference/{reference}.fa.bwt", 
+        "data/reference/{reference}.fa.pac", 
+        "data/reference/{reference}.fa.sa" 
     conda:
         "workflow/envs/bwa.yaml"
     shell: 
-        "bwa index {input.ref}"
+        "bwa index {input}"
 
 rule bwa_mem:
     input:  
-        ref=expand("data/reference/{reference}.fa", reference=config["reference"]),
-        fastq_r1 = expand("data/samples/{sample}_L001_R1_001.fastq.gz",sample=config["samples"]),
-        fastq_r2 = expand("data/samples/{sample}_L001_R2_001.fastq.gz",sample=config["samples"])
+        amb="data/reference/{reference}.fa.amb",
+        ref="data/reference/{reference}.fa",
+        fastq_r1 = "data/samples/{sample}_L001_R1_001.fastq.gz",
+        fastq_r2 = "data/samples/{sample}_L001_R2_001.fastq.gz"
     output: 
-        expand("results/mapped/{sample}.bam", sample=config["samples"])
+        "results/mapped/{reference}/{sample}.bam"
     conda: 
         "workflow/envs/bwa.yaml"
-    shell: "bwa mem {input.ref} {input.fastq_r1} {input.fastq_r2} | samtools view -b > {output}"
+    shell: "bwa mem {input.ref} {input.fastq_r1} {input.fastq_r2} | samtools sort| samtools view -b > {output}"
 
 
-rule sort_alignments:
+rule idx_bam:
     input:
-        #"results/mapped/{sample}.bam"
-        expand("results/mapped/{sample}.bam", sample=config["samples"])
+        "results/mapped/{reference}/{sample}.bam"
     output:
-        #"results/mapped/{sample}.sorted.bam"
-        expand("results/mapped/{sample}.sorted.bam", sample=config["samples"])
+        "results/mapped/{reference}/{sample}.bam.bai"
     conda:
-        "envs/mapping.yaml"
+        "workflow/envs/bwa.yaml"
     shell:
-        "samtools sort -o {output} {input}"
+        "samtools index {input}"
+
+rule idx_fasta:
+    input:
+        "data/reference/{reference}.fa"
+    output:
+        "data/reference/{reference}.fa.fai"
+    conda:
+        "workflow/envs/samtools.yaml"
+    shell:
+        "samtools faidx {input}"
 
 # variant calling (bcftools)
 
+#rule call_variants:
+#    input:
+#        fa=expand("data/reference/{reference}.fa", reference=config["reference"]),
+#        bam=expand("results/mapped/{sample}.sorted.bam", sample=config["samples"])
+#    output:
+#        expand("results/calls/{sample}.vcf", sample=config["samples"])
+#    conda:
+#        "workflow/envs/bcftools.yaml"
+#    shell:
+#        "bcftools mpileup -f {input.fa} {input.bam} | bcftools call -mv - > {output}"
+
 rule call_variants:
     input:
-        fa=expand("data/reference/{reference}.fa", reference=config["reference"]),
-        bam=expand("results/mapped/{sample}.sorted.bam", sample=config["samples"])
+        bam="results/mapped/{reference}/{sample}.bam",
+        bamidx = "results/mapped/{reference}/{sample}.bam.bai",
+        ref="data/reference/{reference}.fa",
+        index="data/reference/{reference}.fa.fai"
     output:
-        expand("results/calls/{sample}.vcf", sample=config["samples"])
-    conda:
-        "workflow/envs/bcftools.yaml"
+        "results/calls_bcftools/{reference}/{sample}.vcf"
+    wildcard_constraints: 
+        reference="[a-z]+"
     shell:
-        "bcftools mpileup -f {input.fa} {input.bam} | bcftools call -mv - > {output}"
-
+        "bcftools mpileup -f {input.ref} {input.bam} | bcftools call -mv - > {output}"
 
 # variant calling (mutserve)
 
+rule mutserve_all:
+    input:
+        expand("results/calls/{sample}.vcf",sample=config["samples"])
+
 rule mutserve:
     input:
-        bam=expand("results/mapped/{sample}.sorted.bam", sample=config["samples"]),
-        #reference=expand("data/reference/{reference}.fa", reference=config["reference"]),
-        reference="mutserve/rCRS.fasta.fai",
-        index=expand("data/reference/{reference}.fa.fai", reference=config["reference"])
+        bam="results/mapped/{sample}.bam",
+        bamidx = "results/mapped/{sample}.bam.bai",
+        reference="data/reference/{reference}.fa",
+        index="data/reference/{reference}.fa.fai"
     output:
-        expand("results/calls/{sample}.vcf",sample=config["samples"]),
-        #expand("results/calls/{sample}.txt",sample=config["samples"]),
-        #expand("results/calls/{sample}_raw.txt",sample=config["samples"])
+        "results/calls_mutserve/{reference}/{sample}.vcf"
     shell:
         "./mutserve/mutserve call --reference {input.reference} --output {output} {input.bam}"
+        #"java -jar ./mutserve/mutserve.jar call --reference {input.reference} --output {output} {input.bam}"
 
 
 #rule fastqc_german:
