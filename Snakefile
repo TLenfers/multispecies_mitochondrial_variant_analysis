@@ -12,6 +12,15 @@ rule all:
     input:
         expand("results/calls_bcftools/{reference}/{sample}.vcf",sample=config["samples"],reference=config["reference"])   
 
+rule get_ref:
+    input:
+        "data/reference/{reference}.fa" 
+    output:
+        "data/reference/{reference}.fa"
+    run:
+        if wildcards.{reference} == "mouse":
+            shell("curl http://ftp.ensembl.org/pub/current_fasta/mus_musculus/dna/Mus_musculus.GRCm39.dna.chromosome.MT.fa.gz | zcat > {output}")
+
 rule bwa_idx:
     input:
         "data/reference/{reference}.fa" 
@@ -83,7 +92,7 @@ rule call_variants:
     wildcard_constraints: 
         reference="[a-z]+"
     shell:
-        "bcftools mpileup -f {input.ref} {input.bam} | bcftools call -mv - > {output}"
+        "bcftools mpileup -f {input.ref} {input.bam} | bcftools call -mv --ploidy 1 -> {output}"
 
 # variant calling (mutserve)
 
