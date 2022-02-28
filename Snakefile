@@ -8,8 +8,8 @@ rule all:
         expand("results/calls_bcftools/{reference}/{sample}.vcf",sample=config["samples"],reference=config["reference"]),
         expand("results/calls_bcftools/{reference}/merged.vcf",reference=config["reference"]),
         expand("results/calls_bcftools/{reference}/normalized/{sample}.vcf.gz",sample=config["samples"],reference=config["reference"]),
-        expand("results/calls_bcftools/{reference}/normalized/merged.vcf",reference=config["reference"])#,
-        #todo uncomment
+expand("results/calls_bcftools/{reference}/normalized/merged_normalized.vcf",reference=config["reference"])#,
+    #todo uncomment
         #expand("results/plots/{reference}/heatmap.pdf",reference=config["reference"])
 
 # TODO : add dog reference, fix download
@@ -104,7 +104,6 @@ rule normalize_variants:
         "workflow/envs/bcftools.yaml"
     shell:
         "bcftools norm  --fasta-ref {input.ref} --check-ref -m {input.vcf} | bcftools view -Ov -o {output}"
-        #"bcftools norm -m +any {input.ref} {input.vcf} -O z -o {output}"
 
 
 # variant calling (mutserve)
@@ -128,7 +127,6 @@ rule mutserve:
 ##################################
 
 # merge vcf
-
 rule zip_vcf:
     input:
         "results/calls_bcftools/{reference}/{sample}.vcf"
@@ -169,7 +167,7 @@ rule merge_vcf_normalized:
     input:
         expand("results/calls_bcftools/{{reference}}/normalized/{sample}.vcf.gz",sample=config["samples"])
     output:
-        "results/calls_bcftools/{reference}/normalized/merged.vcf"
+        "results/calls_bcftools/{reference}/normalized/merged_normalized.vcf"
     conda: "workflow/envs/bcftools.yaml"
     shell: "bcftools merge -m none -O v {input} > {output}"
 
