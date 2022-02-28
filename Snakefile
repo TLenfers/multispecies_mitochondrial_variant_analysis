@@ -5,10 +5,13 @@ configfile: "config/config.yaml"
 
 rule all:
     input:
-        expand("results/calls_bcftools/{reference}/{sample}.vcf",sample=config["samples"],reference=config["reference"]),
+        expand("results/calls_bcftools/{reference}/norm_{sample}.vcf.gz",sample=config["samples"],reference=config["reference"]),
         expand("results/calls_bcftools/{reference}/merged.vcf",reference=config["reference"]),
-        expand("results/calls_bcftools/{reference}/normalized/{sample}.vcf.gz",sample=config["samples"],reference=config["reference"]),
-expand("results/calls_bcftools/{reference}/normalized/merged_normalized.vcf",reference=config["reference"])#,
+        expand("results/calls_bcftools/{reference}/commonVariants.tsv",reference=config["reference"]),
+        expand("results/plots/{reference}/ref_heatmap.pdf",reference=config["reference"]),
+        expand("results/plots/{reference}/ref_heatmap_clusterrow.pdf",reference=config["reference"]),
+        expand("results/plots/{reference}/alt_heatmap.pdf",reference=config["reference"]),
+        expand("results/plots/{reference}/alt_heatmap_clusterrow.pdf",reference=config["reference"])
     #todo uncomment
         #expand("results/plots/{reference}/heatmap.pdf",reference=config["reference"])
 
@@ -99,7 +102,7 @@ rule normalize_variants:
         vcf="results/calls_bcftools/{reference}/{sample}.vcf.gz",
         ref="data/reference/{reference}.fa"
     output:
-        "results/calls_bcftools/{reference}/normalized/{sample}.vcf"
+        "results/calls_bcftools/{reference}/norm_{sample}.vcf"
     conda:
         "workflow/envs/bcftools.yaml"
     shell:
@@ -139,18 +142,6 @@ rule zip_vcf:
     shell:
         "bgzip -f {input}; tabix -f -p vcf {output}"
 
-rule idx_normalized:
-    input:
-        "results/calls_bcftools/{reference}/normalized/{sample}.vcf"
-    output:
-        "results/calls_bcftools/{reference}/normalized/{sample}.vcf.gz"
-    conda:
-        "workflow/envs/bcftools.yaml"
-    wildcard_constraints:
-        reference="[A-Za-z0-9]+",
-        sample="[A-Za-z0-9]+"
-    shell:
-        "bgzip -f {input}; tabix -f -p vcf {output}"
 
 
 rule merge_vcf:
@@ -163,27 +154,29 @@ rule merge_vcf:
         reference="[A-Za-z0-9]+"
     shell: "bcftools merge -m none -O v {input} > {output}"
 
-rule merge_vcf_normalized:
-    input:
-        expand("results/calls_bcftools/{{reference}}/normalized/{sample}.vcf.gz",sample=config["samples"])
-    output:
-        "results/calls_bcftools/{reference}/normalized/merged_normalized.vcf"
-    conda: "workflow/envs/bcftools.yaml"
-    shell: "bcftools merge -m none -O v {input} > {output}"
 
+rule common_variants:
+    input:
+        in_file= "results/calls_bcftools/{reference}/merged.vcf"
+    output:
+        "results/calls_bcftools/{reference}/commonVariants.tsv"
+    conda:
+        "workflow/envs/r-heatmap.yaml"
+    script:
+        "workflow/scripts/common_variants.R"
 
 
 
 # FIXME conda
-#rule plot_variant_heatmap:
-#    input:
-#        "results/calls_bcftools/{reference}/merged.vcf"
-#    output:
-#        "results/plots/{reference}/heatmap.pdf",
-#        "results/plots/{reference}/heatmap_clusterrow.pdf",
-#        "results/plots/{reference}/heatmap_clusterrow_removedCommonVariants.pdf",
-#        "results/plots/{reference}/heatmap_removedCommonVariants.pdf"
-#    conda:
-#        "workflow/envs/r-heatmap.yaml"
-#    script:
-#        "workflow/scripts/plot_variant_heatmap.R"
+rule plot_variant_heatmap:
+    input:
+        "results/calls_bcftools/{reference}/commonVariants.tsv"
+    output:
+        "results/plots/{reference}/ref_heatmap.pdf",
+        "results/plots/{reference}/ref_heatmap_clusterrow.pdf",
+        "results/plots/{reference}/alt_heatmap.pdf",
+        "results/plots/{reference}/alt_heatmap_clusterrow.pdf"
+    conda:
+        "workflow/envs/r-heatmap.yaml"
+    script:
+        "workflow/scripts/plot_variant_heatmap.R"
