@@ -1,6 +1,3 @@
-# TODO: doku: name for samples: sampleid_L001_R1 / R2
-# TODO: doku: Referenz Datei immer .fa
-
 configfile: "config/config.yaml"
 
 rule all:
@@ -12,8 +9,6 @@ rule all:
         expand("results/plots/{reference}/ref_heatmap_clusterrow.pdf",reference=config["reference"]),
         expand("results/plots/{reference}/alt_heatmap.pdf",reference=config["reference"]),
         expand("results/plots/{reference}/alt_heatmap_clusterrow.pdf",reference=config["reference"])
-    #todo uncomment
-        #expand("results/plots/{reference}/heatmap.pdf",reference=config["reference"])
 
 # TODO : add dog reference, fix download
 #rule get_ref:
@@ -166,8 +161,6 @@ rule common_variants:
         "workflow/scripts/common_variants.R"
 
 
-
-# FIXME conda
 rule plot_variant_heatmap:
     input:
         "results/calls_bcftools/{reference}/commonVariants.tsv"

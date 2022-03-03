@@ -1,14 +1,5 @@
-#library(dplyr)
-#library(stringr)
-#library(gplots)
-#library(ggplot2)
-#library(plotrix)
-#library(pheatmap)
-
-#library(RColorBrewer)
-#library(viridis)
-#library(stats)
-
+library(pheatmap)
+library(RColorBrewer)
 
 in_file <- snakemake@input[[1]]
 out_file_1 <- snakemake@output[[1]]
@@ -41,9 +32,9 @@ for(i in 1:ncol(variants)){
 }
 
 for(i in 1:ncol(alt_variants)){
-  variants[,i] <-gsub("1:","",variants[,i])
-  variants[,i] <- gsub(",\\d*","",variants[,i])
-  variants[,i] <- as.numeric(variants[,i])
+  alt_variants[,i] <-gsub("1:","",alt_variants[,i])
+  alt_variants[,i] <- gsub(",\\d*","",alt_variants[,i])
+  alt_variants[,i] <- as.numeric(alt_variants[,i])
 }
 
 names_variants <- colnames(variants)
@@ -67,12 +58,13 @@ pdf(out_file_1,         # File name
     width = 8, height = 7, # Width and height in inches
     bg = "white",          # Background color
     paper = "A4")     
+print(head(variants))
 pheatmap(variants,
          cluster_rows = FALSE,
          legend=TRUE,
          cellwidth = 7,
-         cellheight = 1,
-         fontsize_row = 1.2,
+         cellheight = 7,
+         fontsize_row = 7,
          fontsize_col = 7,
          fontsize = 7,
          color=my.colors,
@@ -86,11 +78,11 @@ pdf(out_file_2,         # File name
     width = 8, height = 7, # Width and height in inches
     bg = "white",          # Background color
     paper = "A4")     
-out <- pheatmap(variants,
+pheatmap(variants,
          cluster_rows =TRUE,
          legend=TRUE,cellwidth = 7,
-         cellheight = 1,
-         fontsize_row = 1.2,
+         cellheight = 7,
+         fontsize_row = 7,
          fontsize_col = 7,
          fontsize = 7,
          color=my.colors,
@@ -113,12 +105,11 @@ pdf(out_file_3,         # File name
     width = 8, height = 7, # Width and height in inches
     bg = "white",          # Background color
     paper = "A4")
-pheatmap(alt_variants,
-         cluster_rows = FALSE,
+pheatmap(alt_variants,         cluster_rows = FALSE,
          legend=TRUE,
          cellwidth = 7,
-         cellheight = 1,
-         fontsize_row = 1.2,
+         cellheight = 7,
+         fontsize_row = 7,
          fontsize_col = 7,
          fontsize = 7,
          color=my.colors,
@@ -132,11 +123,12 @@ pdf(out_file_4,         # File name
     width = 8, height = 7, # Width and height in inches
     bg = "white",          # Background color
     paper = "A4")
-out <- pheatmap(alt_variants,
+print(head(alt_variants))
+pheatmap(alt_variants,
                 cluster_rows =TRUE,
                 legend=TRUE,cellwidth = 7,
-                cellheight = 1,
-                fontsize_row = 1.2,
+                cellheight = 7,
+                fontsize_row = 7,
                 fontsize_col = 7,
                 fontsize = 7,
                 color=my.colors,
