@@ -8,7 +8,10 @@ rule all:
         expand("results/plots/{reference}/ref_heatmap.pdf",reference=config["reference"]),
         expand("results/plots/{reference}/ref_heatmap_clusterrow.pdf",reference=config["reference"]),
         expand("results/plots/{reference}/alt_heatmap.pdf",reference=config["reference"]),
-        expand("results/plots/{reference}/alt_heatmap_clusterrow.pdf",reference=config["reference"])
+        expand("results/plots/{reference}/alt_heatmap_clusterrow.pdf",reference=config["reference"]),
+        expand("results/sequences/{reference}/{sample}.fa",reference=config["reference"],sample=config["samples"])
+        #expand("results/calls_mutserve/{reference}/{sample}.vcf.gz",sample=config["samples"],reference=config["reference"])#,
+        #expand("results/calls_mutserve/{reference}/merged.vcf",reference=config["reference"])
 
 # TODO : add dog reference, fix download
 #rule get_ref:
@@ -44,8 +47,7 @@ rule bwa_mem:
         fastq_r1 = "data/samples/{sample}_L001_R1_001.fastq.gz",
         fastq_r2 = "data/samples/{sample}_L001_R2_001.fastq.gz"
     wildcard_constraints:
-        reference="[A-Za-z0-9]+",
-        sample="[A-Za-z0-9]+"
+        reference="[A-Za-z0-9]+"
     output:
         "results/mapped/{reference}/{sample}.bam"
     conda:
@@ -59,8 +61,7 @@ rule idx_bam:
     output:
         "results/mapped/{reference}/{sample}.bam.bai"
     wildcard_constraints:
-        reference="[A-Za-z0-9]+",
-        sample="[A-Za-z0-9]+"
+        reference="[A-Za-z0-9]+"
     conda:
         "workflow/envs/bwa.yaml"
     shell:
@@ -106,9 +107,9 @@ rule normalize_variants:
 
 # variant calling (mutserve)
 
-rule mutserve_all:
-    input:
-        expand("results/calls/{sample}.vcf",sample=config["samples"])
+#rule mutserve_all:
+#    input:
+#        expand("results/calls/{sample}.vcf",sample=config["samples"])
 
 rule mutserve:
     input:
@@ -173,3 +174,25 @@ rule plot_variant_heatmap:
         "workflow/envs/r-heatmap.yaml"
     script:
         "workflow/scripts/plot_variant_heatmap.R"
+
+rule prepare_for_seq:
+    input:
+            vcf="results/calls_bcftools/{reference}/{sample}.vcf.gz"
+    output:
+        "results/sequences/{reference}/{sample}.vcf.gz",
+        "results/sequences/{reference}/{sample}.vcf.gz.tbi"
+    conda: "envs/vcftools.yaml"
+    shell: "vcftools --gzvcf {input.vcf} --remove-indels --minQ 200.0 --recode --recode-INFO-all --stdout |bgzip > {output[0]}; tabix -p vcf {output[0]}"
+
+# Replace '*', which is the gap symbol in mutserv VCF, with '-', the appropriate 
+# gap symbol in fasta format
+# Further, replace newlines not in the header line
+# Further, replace the header line to update the 'sequence name'
+rule vcf_to_fasta:
+    input: 
+           ref="data/reference/{reference}.fa" ,
+            vcf="results/sequences/{reference}/{sample}.vcf.gz",
+            index="results/sequences/{reference}/{sample}.vcf.gz.tbi"
+    output: "results/sequences/{reference}/{sample}.fa"
+    conda: "envs/bcftools.yaml"
+    shell: "bcftools consensus {input.vcf} < {input.ref} > {output} "
