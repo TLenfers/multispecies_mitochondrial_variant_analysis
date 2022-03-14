@@ -1,29 +1,5 @@
 samples: [
-"AGS-3xMOI25-CAD-1_S34",
-"AGS-3xMOI25-CAD-2_S35",
-"AGS-3xMOI25-CAD-3_S36",
-"AGS-3xMOI25-CAD-un_S28",
-"AGS-3xMOI25-ctrl-1_S10",
-"AGS-3xMOI25-ctrl-2_S16",
-"AGS-3xMOI25-ctrl-3_S22",
-"AGS-3xMOI25-ctrl-un_S4",
-"AGS-wt-24h-un-1A_S1",
-"AGS-wt-24h-un-2B_S7",
-"AGS-wt-24h-un-3C_S13",
-"AGS-wt-48h-un-1A_S2",
-"AGS-wt-48h-un-2B_S8",
-"AGS-wt-48h-un-3C_S14",
-"AGS-wt-96h-un-1A_S3",
-"AGS-wt-96h-un-2B_S9",
-"AGS-wt-96h-un-3C_S15",
-"AGS-wt-G100-24h-1A_S19",
-"AGS-wt-G100-24h-2B_S25",
-"AGS-wt-G100-24h-3C_S31",
-"AGS-wt-G25-96h-1A_S21",
-"AGS-wt-G25-96h-2B_S27",
-"AGS-wt-G25-96h-3C_S33",
-"AGS-wt-G50-48h-1A_S20",
-"AGS-wt-G50-48h-2B_S26",
-"AGS-wt-G50-48h-3C_S32"
+"",
+""
 ]
-reference: "human"
+reference: ""

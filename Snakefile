@@ -181,7 +181,7 @@ rule prepare_for_seq:
     output:
         "results/sequences/{reference}/{sample}.vcf.gz",
         "results/sequences/{reference}/{sample}.vcf.gz.tbi"
-    conda: "envs/vcftools.yaml"
+    conda: "workflow/envs/vcftools.yaml"
     shell: "vcftools --gzvcf {input.vcf} --remove-indels --minQ 200.0 --recode --recode-INFO-all --stdout |bgzip > {output[0]}; tabix -p vcf {output[0]}"
 
 # Replace '*', which is the gap symbol in mutserv VCF, with '-', the appropriate 
@@ -194,5 +194,5 @@ rule vcf_to_fasta:
             vcf="results/sequences/{reference}/{sample}.vcf.gz",
             index="results/sequences/{reference}/{sample}.vcf.gz.tbi"
     output: "results/sequences/{reference}/{sample}.fa"
-    conda: "envs/bcftools.yaml"
+    conda: "workflow/envs/bcftools.yaml"
     shell: "bcftools consensus {input.vcf} < {input.ref} > {output} "
