@@ -1,6 +1,7 @@
 configfile: "config/config.yaml"
 
-
+# Executing all rules for complete analysis
+# Works for Human, Mouse and dog mitochondrial data
 rule all:
     input:
         expand(
@@ -47,6 +48,9 @@ rule all:
         ),
 
 
+# Executing all rules for complete analysis for Human mitochondrial data
+# adds extra the step of calling the mitochondrial variants with mutserve
+# mutserve executable hast to be installed and in the path mutserve/
 rule all_human:
     input:
         expand(
@@ -115,7 +119,7 @@ rule all_human:
 # TODO add consensus sequence for mutserve
 # expand("results/sequences/{caller}/{reference}/{sample}.fa",caller="mutserve",reference=config["reference"],sample=config["samples"])
 
-
+# downloading the mitochondrial reference genome for mouse, dog and human data
 rule get_ref:
     output:
         "data/reference/{reference}.fa",
@@ -134,6 +138,7 @@ rule get_ref:
             )
 
 
+# creates the index for the reference genome
 rule bwa_idx:
     input:
         "data/reference/{reference}.fa",
@@ -151,6 +156,7 @@ rule bwa_idx:
         "bwa index {input}"
 
 
+# mapping of the reads to the reference genome using Burrows-Wheeler Aligner
 rule bwa_mem:
     input:
         amb="data/reference/{reference}.fa.amb",
@@ -166,7 +172,7 @@ rule bwa_mem:
     shell:
         "bwa mem {input.ref} {input.fastq_r1} {input.fastq_r2} | samtools sort| samtools view -b > {output}"
 
-
+# creates a bam index
 rule idx_bam:
     input:
         "results/mapped/{reference}/{sample}.bam",
@@ -175,11 +181,12 @@ rule idx_bam:
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
     conda:
-        "workflow/envs/bwa.yaml"
+        "workflow/envs/samtools.yaml"
     shell:
         "samtools index {input}"
 
 
+# creates index for the reference sequence in fasta format
 rule idx_fasta:
     input:
         "data/reference/{reference}.fa",
@@ -194,6 +201,7 @@ rule idx_fasta:
 ###############################################################################
 # variant calling (bcftools)
 ###############################################################################
+# calls the variants using bcftools from the bam file
 rule call_variants:
     input:
         bam="results/mapped/{reference}/{sample}.bam",
@@ -210,6 +218,7 @@ rule call_variants:
         "bcftools mpileup -f {input.ref} {input.bam} | bcftools call -mv --ploidy 1 -> {output}"
 
 
+# left-align and normalization of the variants
 rule normalize_variants:
     input:
         vcf="results/calls_bcftools/{reference}/{sample}.vcf.gz",
@@ -227,6 +236,8 @@ rule normalize_variants:
 ###############################################################################
 
 
+# calls the variants using bcftools from the bam file
+# works only for human mitochondrial data
 rule mutserve:
     input:
         bam="results/mapped/{reference}/{sample}.bam",
@@ -244,10 +255,8 @@ rule mutserve:
 
 ###############################################################################
 # analysis
-###############################################################################
 
-
-# merge vcf
+# compress the vcf file
 rule zip_vcf:
     input:
         "results/calls_{caller}/{reference}/{sample}.vcf",
@@ -261,6 +270,7 @@ rule zip_vcf:
         "bgzip -f {input}; tabix -f -p vcf {output}"
 
 
+# merges the variants
 rule merge_vcf:
     input:
         expand(
@@ -277,6 +287,7 @@ rule merge_vcf:
         "bcftools merge -m none -O v {input} > {output}"
 
 
+# extracts the common variants out of the merged vcf file
 rule common_variants:
     input:
         in_file="results/calls_{caller}/{reference}/merged.vcf",
@@ -288,6 +299,7 @@ rule common_variants:
         "workflow/scripts/common_variants.R"
 
 
+# creates the heatmap plots for the common variants of dog and mouse data
 rule plot_variant_heatmap:
     input:
         "results/calls_{caller}/{reference}/commonVariants.tsv",
@@ -301,7 +313,9 @@ rule plot_variant_heatmap:
     script:
         "workflow/scripts/plot_variant_heatmap.R"
 
-
+# prepares variants data for creating the consensus sequence
+# removes indels and SNPs with low quality
+# quality score is set to min of 200 given out by bcftools
 rule prepare_for_seq:
     input:
         vcf="results/calls_{caller}/{reference}/{sample}.vcf.gz",
@@ -314,10 +328,7 @@ rule prepare_for_seq:
         "vcftools --gzvcf {input.vcf} --remove-indels --minQ 200.0 --recode --recode-INFO-all --stdout |bgzip > {output[0]}; tabix -p vcf {output[0]}"
 
 
-# Replace '*', which is the gap symbol in mutserv VCF, with '-', the appropriate
-# gap symbol in fasta format
-# Further, replace newlines not in the header line
-# Further, replace the header line to update the 'sequence name'
+# creates the consensus sequence
 rule vcf_to_fasta:
     input:
         ref="data/reference/{reference}.fa",
