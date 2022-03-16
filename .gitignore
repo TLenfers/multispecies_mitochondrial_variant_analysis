@@ -160,5 +160,6 @@ cython_debug/
 data/*
 .snakemake/*
 results/*
-config/config.yaml
 mutserve/
+.idea/
+config/config.yaml
