@@ -1,161 +1,287 @@
 configfile: "config/config.yaml"
 
+
 rule all:
     input:
-        expand("results/calls_bcftools/{reference}/norm_{sample}.vcf.gz",sample=config["samples"],reference=config["reference"]),
-        expand("results/calls_bcftools/{reference}/merged.vcf",reference=config["reference"]),
-        expand("results/calls_bcftools/{reference}/commonVariants.tsv",reference=config["reference"]),
-        expand("results/plots/{reference}/ref_heatmap.pdf",reference=config["reference"]),
-        expand("results/plots/{reference}/ref_heatmap_clusterrow.pdf",reference=config["reference"]),
-        expand("results/plots/{reference}/alt_heatmap.pdf",reference=config["reference"]),
-        expand("results/plots/{reference}/alt_heatmap_clusterrow.pdf",reference=config["reference"]),
-        expand("results/sequences/{reference}/{sample}.fa",reference=config["reference"],sample=config["samples"])
-        #expand("results/calls_mutserve/{reference}/{sample}.vcf.gz",sample=config["samples"],reference=config["reference"])#,
-        #expand("results/calls_mutserve/{reference}/merged.vcf",reference=config["reference"])
+        expand(
+            "results/calls_bcftools/{reference}/norm_{sample}.vcf.gz",
+            caller="bcftools",
+            sample=config["samples"],
+            reference=config["reference"],
+        ),
+        expand(
+            "results/calls_{caller}/{reference}/merged.vcf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/calls_{caller}/{reference}/commonVariants.tsv",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/ref_heatmap.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/ref_heatmap_clusterrow.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/alt_heatmap.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/alt_heatmap_clusterrow.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/sequences/{caller}/{reference}/{sample}.fa",
+            caller="bcftools",
+            reference=config["reference"],
+            sample=config["samples"],
+        ),
 
-# TODO : add dog reference, fix download
-#rule get_ref:
-#    input:
-#        "data/reference/{reference}.fa"
-#    output:
-#        "data/reference/{reference}.fa"
-#    run:
-#        if wildcards.{reference} == "mouse":
-#            shell("curl http://ftp.ensembl.org/pub/current_fasta/mus_musculus/dna/Mus_musculus.GRCm39.dna.chromosome.MT.fa.gz | zcat > {output}")
+
+rule all_human:
+    input:
+        expand(
+            "results/calls_{caller}/{reference}/norm_{sample}.vcf.gz",
+            caller="bcftools",
+            sample=config["samples"],
+            reference=config["reference"],
+        ),
+        expand(
+            "results/calls_{caller}/{reference}/merged.vcf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/calls_{caller}/{reference}/commonVariants.tsv",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/ref_heatmap.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/ref_heatmap_clusterrow.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/alt_heatmap.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/alt_heatmap_clusterrow.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/sequences/{caller}/{reference}/{sample}.fa",
+            caller="bcftools",
+            reference=config["reference"],
+            sample=config["samples"],
+        ),
+        # mutserve:
+        expand(
+            "results/calls_{caller}/{reference}/{sample}.vcf.gz",
+            caller="mutserve",
+            sample=config["samples"],
+            reference=config["reference"],
+        ),
+        expand(
+            "results/calls_{caller}/{reference}/merged.vcf",
+            caller="mutserve",
+            reference=config["reference"],
+        ),
+        #TODO add plots & common variants for mutserve | r-scrpips for bcftools cannot be used
+
+
+#        expand("results/calls_{caller}/{reference}/commonVariants.tsv",caller="mutserve",reference=config["reference"])#,
+# expand("results/plots/{caller}/{reference}/ref_heatmap.pdf",caller="mutserve",reference=config["reference"]),
+# expand("results/plots/{caller}/{reference}/ref_heatmap_clusterrow.pdf",caller="mutserve",reference=config["reference"]),
+# expand("results/plots/{caller}/{reference}/alt_heatmap.pdf",caller="mutserve",reference=config["reference"]),
+# expand("results/plots/{caller}/{reference}/alt_heatmap_clusterrow.pdf",caller="mutserve",reference=config["reference"]),
+
+# TODO add consensus sequence for mutserve
+# expand("results/sequences/{caller}/{reference}/{sample}.fa",caller="mutserve",reference=config["reference"],sample=config["samples"])
+
+
+rule get_ref:
+    output:
+        "data/reference/{reference}.fa",
+    run:
+        if config["reference"] == "mouse":
+            shell(
+                "wget -O- http://ftp.ensembl.org/pub/current_fasta/mus_musculus/dna/Mus_musculus.GRCm39.dna.chromosome.MT.fa.gz | zcat > {output}"
+            )
+        if config["reference"] == "dog":
+            shell(
+                "wget -O- https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id=U96639.2&db=nuccore&report=fasta| zcat > {output}"
+            )
+        if config["reference"] == "human":
+            shell(
+                "wget -O- http://ftp.ensembl.org/pub/current_fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.MT.fa.gz |zcat > {output} && sed -i '1c\>chrM' {output}"
+            )
 
 
 rule bwa_idx:
     input:
-        "data/reference/{reference}.fa" 
+        "data/reference/{reference}.fa",
     output:
-        "data/reference/{reference}.fa.amb", 
-        "data/reference/{reference}.fa.ann", 
-        "data/reference/{reference}.fa.bwt", 
-        "data/reference/{reference}.fa.pac", 
-        "data/reference/{reference}.fa.sa" 
+        "data/reference/{reference}.fa.amb",
+        "data/reference/{reference}.fa.ann",
+        "data/reference/{reference}.fa.bwt",
+        "data/reference/{reference}.fa.pac",
+        "data/reference/{reference}.fa.sa",
     wildcard_constraints:
-        reference="[A-Za-z0-9]+"
+        reference="[A-Za-z0-9]+",
     conda:
         "workflow/envs/bwa.yaml"
-    shell: 
+    shell:
         "bwa index {input}"
 
+
 rule bwa_mem:
-    input:  
+    input:
         amb="data/reference/{reference}.fa.amb",
         ref="data/reference/{reference}.fa",
-        fastq_r1 = "data/samples/{sample}_L001_R1_001.fastq.gz",
-        fastq_r2 = "data/samples/{sample}_L001_R2_001.fastq.gz"
+        fastq_r1="data/samples/{sample}_L001_R1_001.fastq.gz",
+        fastq_r2="data/samples/{sample}_L001_R2_001.fastq.gz",
     wildcard_constraints:
-        reference="[A-Za-z0-9]+"
+        reference="[A-Za-z0-9]+",
     output:
-        "results/mapped/{reference}/{sample}.bam"
+        "results/mapped/{reference}/{sample}.bam",
     conda:
         "workflow/envs/bwa.yaml"
-    shell: "bwa mem {input.ref} {input.fastq_r1} {input.fastq_r2} | samtools sort| samtools view -b > {output}"
+    shell:
+        "bwa mem {input.ref} {input.fastq_r1} {input.fastq_r2} | samtools sort| samtools view -b > {output}"
 
 
 rule idx_bam:
     input:
-        "results/mapped/{reference}/{sample}.bam"
+        "results/mapped/{reference}/{sample}.bam",
     output:
-        "results/mapped/{reference}/{sample}.bam.bai"
+        "results/mapped/{reference}/{sample}.bam.bai",
     wildcard_constraints:
-        reference="[A-Za-z0-9]+"
+        reference="[A-Za-z0-9]+",
     conda:
         "workflow/envs/bwa.yaml"
     shell:
         "samtools index {input}"
 
+
 rule idx_fasta:
     input:
-        "data/reference/{reference}.fa"
+        "data/reference/{reference}.fa",
     output:
-        "data/reference/{reference}.fa.fai"
+        "data/reference/{reference}.fa.fai",
     conda:
         "workflow/envs/samtools.yaml"
     shell:
         "samtools faidx {input}"
 
+
+###############################################################################
 # variant calling (bcftools)
+###############################################################################
 rule call_variants:
     input:
         bam="results/mapped/{reference}/{sample}.bam",
-        bamidx = "results/mapped/{reference}/{sample}.bam.bai",
+        bamidx="results/mapped/{reference}/{sample}.bam.bai",
         ref="data/reference/{reference}.fa",
-        index="data/reference/{reference}.fa.fai"
+        index="data/reference/{reference}.fa.fai",
     output:
-        "results/calls_bcftools/{reference}/{sample}.vcf"
+        "results/calls_bcftools/{reference}/{sample}.vcf",
     wildcard_constraints:
-        reference="[A-Za-z0-9]+"
+        reference="[A-Za-z0-9]+",
     conda:
         "workflow/envs/bcftools.yaml"
     shell:
         "bcftools mpileup -f {input.ref} {input.bam} | bcftools call -mv --ploidy 1 -> {output}"
 
+
 rule normalize_variants:
     input:
         vcf="results/calls_bcftools/{reference}/{sample}.vcf.gz",
-        ref="data/reference/{reference}.fa"
+        ref="data/reference/{reference}.fa",
     output:
-        "results/calls_bcftools/{reference}/norm_{sample}.vcf"
+        "results/calls_bcftools/{reference}/norm_{sample}.vcf",
     conda:
         "workflow/envs/bcftools.yaml"
     shell:
         "bcftools norm  --fasta-ref {input.ref} --check-ref -m {input.vcf} | bcftools view -Ov -o {output}"
 
 
+###############################################################################
 # variant calling (mutserve)
+###############################################################################
 
-#rule mutserve_all:
-#    input:
-#        expand("results/calls/{sample}.vcf",sample=config["samples"])
 
 rule mutserve:
     input:
-        bam="results/mapped/{sample}.bam",
-        bamidx = "results/mapped/{sample}.bam.bai",
-        reference="data/reference/{reference}.fa",
-        index="data/reference/{reference}.fa.fai"
+        bam="results/mapped/{reference}/{sample}.bam",
+        bamidx="results/mapped/{reference}/{sample}.bam.bai",
+        ref="data/reference/{reference}.fa",
+        index="data/reference/{reference}.fa.fai",
     output:
-        "results/calls_mutserve/{reference}/{sample}.vcf"
+        "results/calls_mutserve/{reference}/{sample}.vcf",
+    wildcard_constraints:
+        reference="[A-Za-z0-9]+",
     shell:
-        "./mutserve/mutserve call --reference {input.reference} --output {output} {input.bam}"
-        #"java -jar ./mutserve/mutserve.jar call --reference {input.reference} --output {output} {input.bam}"
+        "./mutserve/mutserve call --reference {input.ref} --output {output} {input.bam}"
+        #"java -jar ./mutserve/mutserve.jar call --reference {input.ref} --output {output} {input.bam}"
 
-##################################
+
+###############################################################################
+# analysis
+###############################################################################
+
 
 # merge vcf
 rule zip_vcf:
     input:
-        "results/calls_bcftools/{reference}/{sample}.vcf"
+        "results/calls_{caller}/{reference}/{sample}.vcf",
     output:
-        "results/calls_bcftools/{reference}/{sample}.vcf.gz"
+        "results/calls_{caller}/{reference}/{sample}.vcf.gz",
     conda:
         "workflow/envs/bcftools.yaml"
     wildcard_constraints:
-        reference="[A-Za-z0-9]+"
+        reference="[A-Za-z0-9]+",
     shell:
         "bgzip -f {input}; tabix -f -p vcf {output}"
 
 
-
 rule merge_vcf:
     input:
-        expand("results/calls_bcftools/{{reference}}/{sample}.vcf.gz",sample=config["samples"])
+        expand(
+            "results/calls_{{caller}}/{{reference}}/{sample}.vcf.gz",
+            sample=config["samples"],
+        ),
     output:
-        "results/calls_bcftools/{reference}/merged.vcf"
-    conda: "workflow/envs/bcftools.yaml"
+        "results/calls_{caller}/{reference}/merged.vcf",
+    conda:
+        "workflow/envs/bcftools.yaml"
     wildcard_constraints:
-        reference="[A-Za-z0-9]+"
-    shell: "bcftools merge -m none -O v {input} > {output}"
+        reference="[A-Za-z0-9]+",
+    shell:
+        "bcftools merge -m none -O v {input} > {output}"
 
 
 rule common_variants:
     input:
-        in_file= "results/calls_bcftools/{reference}/merged.vcf"
+        in_file="results/calls_{caller}/{reference}/merged.vcf",
     output:
-        "results/calls_bcftools/{reference}/commonVariants.tsv"
+        "results/calls_{caller}/{reference}/commonVariants.tsv",
     conda:
         "workflow/envs/r-heatmap.yaml"
     script:
@@ -164,35 +290,42 @@ rule common_variants:
 
 rule plot_variant_heatmap:
     input:
-        "results/calls_bcftools/{reference}/commonVariants.tsv"
+        "results/calls_{caller}/{reference}/commonVariants.tsv",
     output:
-        "results/plots/{reference}/ref_heatmap.pdf",
-        "results/plots/{reference}/ref_heatmap_clusterrow.pdf",
-        "results/plots/{reference}/alt_heatmap.pdf",
-        "results/plots/{reference}/alt_heatmap_clusterrow.pdf"
+        "results/plots/{caller}/{reference}/ref_heatmap.pdf",
+        "results/plots/{caller}/{reference}/ref_heatmap_clusterrow.pdf",
+        "results/plots/{caller}/{reference}/alt_heatmap.pdf",
+        "results/plots/{caller}/{reference}/alt_heatmap_clusterrow.pdf",
     conda:
         "workflow/envs/r-heatmap.yaml"
     script:
         "workflow/scripts/plot_variant_heatmap.R"
 
+
 rule prepare_for_seq:
     input:
-            vcf="results/calls_bcftools/{reference}/{sample}.vcf.gz"
+        vcf="results/calls_{caller}/{reference}/{sample}.vcf.gz",
     output:
-        "results/sequences/{reference}/{sample}.vcf.gz",
-        "results/sequences/{reference}/{sample}.vcf.gz.tbi"
-    conda: "workflow/envs/vcftools.yaml"
-    shell: "vcftools --gzvcf {input.vcf} --remove-indels --minQ 200.0 --recode --recode-INFO-all --stdout |bgzip > {output[0]}; tabix -p vcf {output[0]}"
+        "results/sequences/{caller}/{reference}/{sample}.vcf.gz",
+        "results/sequences/{caller}/{reference}/{sample}.vcf.gz.tbi",
+    conda:
+        "workflow/envs/vcftools.yaml"
+    shell:
+        "vcftools --gzvcf {input.vcf} --remove-indels --minQ 200.0 --recode --recode-INFO-all --stdout |bgzip > {output[0]}; tabix -p vcf {output[0]}"
 
-# Replace '*', which is the gap symbol in mutserv VCF, with '-', the appropriate 
+
+# Replace '*', which is the gap symbol in mutserv VCF, with '-', the appropriate
 # gap symbol in fasta format
 # Further, replace newlines not in the header line
 # Further, replace the header line to update the 'sequence name'
 rule vcf_to_fasta:
-    input: 
-           ref="data/reference/{reference}.fa" ,
-            vcf="results/sequences/{reference}/{sample}.vcf.gz",
-            index="results/sequences/{reference}/{sample}.vcf.gz.tbi"
-    output: "results/sequences/{reference}/{sample}.fa"
-    conda: "workflow/envs/bcftools.yaml"
-    shell: "bcftools consensus {input.vcf} < {input.ref} > {output} "
+    input:
+        ref="data/reference/{reference}.fa",
+        vcf="results/sequences/{caller}/{reference}/{sample}.vcf.gz",
+        index="results/sequences/{caller}/{reference}/{sample}.vcf.gz.tbi",
+    output:
+        "results/sequences/{caller}/{reference}/{sample}.fa",
+    conda:
+        "workflow/envs/bcftools.yaml"
+    shell:
+        "bcftools consensus {input.vcf} < {input.ref} > {output} "
