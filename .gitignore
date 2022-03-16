@@ -157,7 +157,10 @@ cython_debug/
 # Built Visual Studio Code Extensions
 *.vsix
 
-data/*
+data/reference/*
+data/samples/*
+!data/samples/readme_samples.md
+
 .snakemake/*
 results/*
 mutserve/*
