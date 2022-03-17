@@ -1,0 +1,134 @@
+from snakemake.utils import min_version
+
+##### set minimum snakemake version #####
+min_version("5.3.0")
+
+
+##### setup config #####
+configfile: "config/config.yaml"
+
+
+# this container defines the underlying OS for each job when using the workflow
+# with --use-conda --use-singularity
+container: "docker://continuumio/miniconda3"
+
+
+##### load rules #####
+include: "rules/reference.smk"
+include: "rules/align.smk"
+include: "rules/variants_bcftools.smk"
+include: "rules/variants_mutserve.smk"
+include: "rules/analysis.smk"
+include: "rules/helper.smk"
+include: "rules/consensus_sequence.smk"
+
+
+# Executing all rules for complete analysis
+# Works for Human, Mouse and dog mitochondrial data
+rule all:
+    input:
+        expand(
+            "results/calls_bcftools/{reference}/norm_{sample}.vcf.gz",
+            caller="bcftools",
+            sample=config["samples"],
+            reference=config["reference"],
+        ),
+        expand(
+            "results/calls_{caller}/{reference}/merged.vcf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/calls_{caller}/{reference}/commonVariants.tsv",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/ref_heatmap.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/ref_heatmap_clusterrow.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/alt_heatmap.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/alt_heatmap_clusterrow.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/sequences/{caller}/{reference}/{sample}.fa",
+            caller="bcftools",
+            reference=config["reference"],
+            sample=config["samples"],
+        ),
+    log:
+        "logs/all.log",
+
+
+# Executing all rules for complete analysis for Human mitochondrial data
+# adds extra the step of calling the mitochondrial variants with mutserve
+# mutserve executable hast to be installed and in the path mutserve/
+rule all_human:
+    input:
+        expand(
+            "results/calls_{caller}/{reference}/norm_{sample}.vcf.gz",
+            caller="bcftools",
+            sample=config["samples"],
+            reference=config["reference"],
+        ),
+        expand(
+            "results/calls_{caller}/{reference}/merged.vcf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/calls_{caller}/{reference}/commonVariants.tsv",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/ref_heatmap.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/ref_heatmap_clusterrow.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/alt_heatmap.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/plots/{caller}/{reference}/alt_heatmap_clusterrow.pdf",
+            caller="bcftools",
+            reference=config["reference"],
+        ),
+        expand(
+            "results/sequences/{caller}/{reference}/{sample}.fa",
+            caller="bcftools",
+            reference=config["reference"],
+            sample=config["samples"],
+        ),
+        # mutserve:
+        expand(
+            "results/calls_{caller}/{reference}/{sample}.vcf.gz",
+            caller="mutserve",
+            sample=config["samples"],
+            reference=config["reference"],
+        ),
+        expand(
+            "results/calls_{caller}/{reference}/merged.vcf",
+            caller="mutserve",
+            reference=config["reference"],
+        ),
