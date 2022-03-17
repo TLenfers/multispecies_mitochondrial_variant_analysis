@@ -163,7 +163,5 @@ data/samples/*
 
 .snakemake/*
 results/*
-mutserve/*
-!mutserve/readme_mutserve.md
 .idea/
 config/config.yaml

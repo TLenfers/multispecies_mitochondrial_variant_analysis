@@ -1,5 +1,6 @@
 configfile: "config/config.yaml"
 
+
 # Executing all rules for complete analysis
 # Works for Human, Mouse and dog mitochondrial data
 rule all:
@@ -46,6 +47,8 @@ rule all:
             reference=config["reference"],
             sample=config["samples"],
         ),
+    log:
+        "logs/all.log",
 
 
 # Executing all rules for complete analysis for Human mitochondrial data
@@ -107,22 +110,14 @@ rule all_human:
             caller="mutserve",
             reference=config["reference"],
         ),
-        #TODO add plots & common variants for mutserve | r-scrpips for bcftools cannot be used
 
-
-#        expand("results/calls_{caller}/{reference}/commonVariants.tsv",caller="mutserve",reference=config["reference"])#,
-# expand("results/plots/{caller}/{reference}/ref_heatmap.pdf",caller="mutserve",reference=config["reference"]),
-# expand("results/plots/{caller}/{reference}/ref_heatmap_clusterrow.pdf",caller="mutserve",reference=config["reference"]),
-# expand("results/plots/{caller}/{reference}/alt_heatmap.pdf",caller="mutserve",reference=config["reference"]),
-# expand("results/plots/{caller}/{reference}/alt_heatmap_clusterrow.pdf",caller="mutserve",reference=config["reference"]),
-
-# TODO add consensus sequence for mutserve
-# expand("results/sequences/{caller}/{reference}/{sample}.fa",caller="mutserve",reference=config["reference"],sample=config["samples"])
 
 # downloading the mitochondrial reference genome for mouse, dog and human data
 rule get_ref:
     output:
         "data/reference/{reference}.fa",
+    log:
+        "logs/{reference}/get_ref.log",
     run:
         if config["reference"] == "mouse":
             shell(
@@ -152,6 +147,8 @@ rule bwa_idx:
         reference="[A-Za-z0-9]+",
     conda:
         "workflow/envs/bwa.yaml"
+    log:
+        "logs/{reference}/bwa_idx.log",
     shell:
         "bwa index {input}"
 
@@ -169,8 +166,11 @@ rule bwa_mem:
         "results/mapped/{reference}/{sample}.bam",
     conda:
         "workflow/envs/bwa.yaml"
+    log:
+        "logs/{reference}/{sample}.bwa.log",
     shell:
         "bwa mem {input.ref} {input.fastq_r1} {input.fastq_r2} | samtools sort| samtools view -b > {output}"
+
 
 # creates a bam index
 rule idx_bam:
@@ -182,6 +182,8 @@ rule idx_bam:
         reference="[A-Za-z0-9]+",
     conda:
         "workflow/envs/samtools.yaml"
+    log:
+        "logs/{reference}/{sample}.bam.bai.log",
     shell:
         "samtools index {input}"
 
@@ -194,6 +196,8 @@ rule idx_fasta:
         "data/reference/{reference}.fa.fai",
     conda:
         "workflow/envs/samtools.yaml"
+    log:
+        "logs/{reference}/idx_fasta.log",
     shell:
         "samtools faidx {input}"
 
@@ -214,6 +218,8 @@ rule call_variants:
         reference="[A-Za-z0-9]+",
     conda:
         "workflow/envs/bcftools.yaml"
+    log:
+        "logs/{reference}/{sample}.bcftools.log",
     shell:
         "bcftools mpileup -f {input.ref} {input.bam} | bcftools call -mv --ploidy 1 -> {output}"
 
@@ -227,6 +233,8 @@ rule normalize_variants:
         "results/calls_bcftools/{reference}/norm_{sample}.vcf",
     conda:
         "workflow/envs/bcftools.yaml"
+    log:
+        "logs/{reference}/{sample}.log",
     shell:
         "bcftools norm  --fasta-ref {input.ref} --check-ref -m {input.vcf} | bcftools view -Ov -o {output}"
 
@@ -248,13 +256,17 @@ rule mutserve:
         "results/calls_mutserve/{reference}/{sample}.vcf",
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
+    container:
+        "docker://stephenturner/mutserve"
+    log:
+        "logs/calls_mutserve/{reference}/{sample}.log",
     shell:
-        "./mutserve/mutserve call --reference {input.ref} --output {output} {input.bam}"
-        #"java -jar ./mutserve/mutserve.jar call --reference {input.ref} --output {output} {input.bam}"
+        "mutserve call --reference {input.ref} --output {output} {input.bam}"
 
 
 ###############################################################################
 # analysis
+
 
 # compress the vcf file
 rule zip_vcf:
@@ -266,6 +278,8 @@ rule zip_vcf:
         "workflow/envs/bcftools.yaml"
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
+    log:
+        "logs/{caller}/{reference}/zip_vcf/{sample}.log",
     shell:
         "bgzip -f {input}; tabix -f -p vcf {output}"
 
@@ -283,6 +297,8 @@ rule merge_vcf:
         "workflow/envs/bcftools.yaml"
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
+    log:
+        "logs/{caller}/{reference}/merge_vcf/merged.log",
     shell:
         "bcftools merge -m none -O v {input} > {output}"
 
@@ -295,6 +311,8 @@ rule common_variants:
         "results/calls_{caller}/{reference}/commonVariants.tsv",
     conda:
         "workflow/envs/r-heatmap.yaml"
+    log:
+        "logs/calls_{caller}/{reference}/commonVariants.log",
     script:
         "workflow/scripts/common_variants.R"
 
@@ -310,8 +328,11 @@ rule plot_variant_heatmap:
         "results/plots/{caller}/{reference}/alt_heatmap_clusterrow.pdf",
     conda:
         "workflow/envs/r-heatmap.yaml"
+    log:
+        "logs/{caller}/{reference}/plot_variant_heatmap.log",
     script:
         "workflow/scripts/plot_variant_heatmap.R"
+
 
 # prepares variants data for creating the consensus sequence
 # removes indels and SNPs with low quality
@@ -320,12 +341,14 @@ rule prepare_for_seq:
     input:
         vcf="results/calls_{caller}/{reference}/{sample}.vcf.gz",
     output:
-        "results/sequences/{caller}/{reference}/{sample}.vcf.gz",
-        "results/sequences/{caller}/{reference}/{sample}.vcf.gz.tbi",
+        vcf="results/sequences/{caller}/{reference}/{sample}.vcf.gz",
+        tbi="results/sequences/{caller}/{reference}/{sample}.vcf.gz.tbi",
     conda:
         "workflow/envs/vcftools.yaml"
+    log:
+        "logs/{caller}/{reference}/{sample}.prepare_for_seq.log",
     shell:
-        "vcftools --gzvcf {input.vcf} --remove-indels --minQ 200.0 --recode --recode-INFO-all --stdout |bgzip > {output[0]}; tabix -p vcf {output[0]}"
+        "vcftools --gzvcf {input.vcf} --remove-indels --minQ 200.0 --recode --recode-INFO-all --stdout |bgzip > {output.vcf}; tabix -p vcf {output.tbi}"
 
 
 # creates the consensus sequence
@@ -335,8 +358,10 @@ rule vcf_to_fasta:
         vcf="results/sequences/{caller}/{reference}/{sample}.vcf.gz",
         index="results/sequences/{caller}/{reference}/{sample}.vcf.gz.tbi",
     output:
-        "results/sequences/{caller}/{reference}/{sample}.fa",
+        fa="results/sequences/{caller}/{reference}/{sample}.fa",
     conda:
         "workflow/envs/bcftools.yaml"
+    log:
+        "logs/vcf_to_fasta/{caller}/{reference}/{sample}.log",
     shell:
-        "bcftools consensus {input.vcf} < {input.ref} > {output} "
+        "bcftools consensus {input.vcf} < {input.ref} > {output.fa} "
