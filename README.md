@@ -10,7 +10,7 @@ git clone https://github.com/tlenfers/multispecies_mitochondrial_variant_analysi
 cd multispecies_mitochondrial_variant_analysis
 ```
 
-3. Install dependencies
+2. Install dependencies
 ```bash
 # download Miniconda3 installer
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -24,22 +24,25 @@ conda activate wf
 ```
 ## Configuration
 **Config files**:
-  - [`config.yaml`](/config/config.yaml) - analysis-specific settings 
-  - `environment.yaml` - software dependencies and versions
-  - [`samples.tsv`](/config/samples.tsv) - list of (paired) samples
+
+  - [`config.yaml`](config/config.yaml) - analysis-specific settings 
+  - [`environment.yaml`](environment.yaml) - software dependencies and versions
+  - [`samples.tsv`](config/samples.tsv) - list of (paired) samples
 
 **Samples:**
+
   - Put all sample names in a single column in [`samples.tsv`](/config/samples.tsv).
-  - Put all sample files in `/workflow/data/samples/`
-  -assumed naming convention:
+  - Put all sample files in `workflow/data/samples/`
+  - assumed naming convention:
     - sampleName_R1.fastq.gz
     - sampleName_R2.fastq.gz
 
 **Reference:**
+
 To analyse dog, mouse or human samples the corresponding reference will be downloaded.
 Define the to be analysed species in [`config.yaml`](/config/config.yaml) under reference.
 
-If you want to analyse a different species or use your own reference, enter the name of the file in [`config.yaml`](/config/config.yaml).
+If you want to analyse a different species or use your own reference, enter the name of the file in [`config.yaml`](config/config.yaml).
 The reference file (name.fa) should be put in `workflow/data/reference`.
 
 ## Execute the workflow
