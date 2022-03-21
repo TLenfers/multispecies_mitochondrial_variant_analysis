@@ -47,8 +47,7 @@ The reference file (name.fa) should be put in `workflow/data/reference`.
 
 ## Execute the workflow
 ```bash
-cd multispecies_mitochondrial_variant_analysis
-
+cd workflow
 # 'dry' run only checks I/O files
 snakemake -np
 
