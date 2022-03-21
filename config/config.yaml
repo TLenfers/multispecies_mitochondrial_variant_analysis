@@ -1,4 +1,4 @@
 # path or URL to sample sheet (TSV format, columns: sample)
-samples: config/samples.yaml
+samples: config/samples.tsv
 # species of the samples and reference genome (dog, human, mouse)
 reference: ""
