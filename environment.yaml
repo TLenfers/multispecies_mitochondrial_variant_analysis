@@ -1,4 +1,5 @@
-channels:
+channels: 
   - bioconda
+  - conda-forge
 dependencies:
   - snakemake=6.15.3

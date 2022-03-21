@@ -18,6 +18,10 @@ wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O mi
 bash miniconda.sh
 # update Conda
 conda update -y conda
+# setup channels 
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
 # create & activate new env with installed deps
 conda env create -n wf -f environment.yaml
 conda activate wf
@@ -52,7 +56,7 @@ cd workflow
 snakemake -np
 
 # To run mutlipecies variant analysis
-snakemake -j n all --use-conda 
+snakemake -j n all --use-conda --use-singularity
 # where n is the numer of cores to use
 
 # To run human variant analysis with mutserve
