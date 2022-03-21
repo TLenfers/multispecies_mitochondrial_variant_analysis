@@ -45,4 +45,4 @@ rule plot_variant_heatmap:
     log:
         "logs/{caller}/{reference}/plot_variant_heatmap.log",
     script:
-        "scripts/plot_variant_heatmap.R"
+        "../scripts/plot_variant_heatmap.R"
