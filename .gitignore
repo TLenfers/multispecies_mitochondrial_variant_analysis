@@ -161,7 +161,9 @@ workflow/data/reference/*
 workflow/data/samples/*
 !workflow/data/samples/readme_samples.md
 
+workflow/.snakemake/*
 .snakemake/*
+workflow/results/*
 results/*
 .idea/
 config/config.yaml
