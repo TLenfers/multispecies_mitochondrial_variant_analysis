@@ -1,11 +1,11 @@
 from snakemake.utils import min_version
-
-##### set minimum snakemake version #####
-min_version("5.3.0")
-
+from pandas import read_table
 
 ##### setup config #####
-configfile: "config/config.yaml"
+configfile: "../config/config.yaml"
+sample_file = "../"+config["sample_file"]
+samples = read_table(sample_file)['sample_name'].tolist()
+print(samples)
 
 
 # this container defines the underlying OS for each job when using the workflow
@@ -30,7 +30,7 @@ rule all:
         expand(
             "results/calls_bcftools/{reference}/norm_{sample}.vcf.gz",
             caller="bcftools",
-            sample=config["samples"],
+            sample=samples,
             reference=config["reference"],
         ),
         expand(
@@ -66,8 +66,8 @@ rule all:
         expand(
             "results/sequences/{caller}/{reference}/{sample}.fa",
             caller="bcftools",
+            sample=samples,
             reference=config["reference"],
-            sample=config["samples"],
         ),
     log:
         "logs/all.log",
@@ -81,7 +81,7 @@ rule all_human:
         expand(
             "results/calls_{caller}/{reference}/norm_{sample}.vcf.gz",
             caller="bcftools",
-            sample=config["samples"],
+            sample=samples,
             reference=config["reference"],
         ),
         expand(
@@ -117,14 +117,14 @@ rule all_human:
         expand(
             "results/sequences/{caller}/{reference}/{sample}.fa",
             caller="bcftools",
+            sample=samples,
             reference=config["reference"],
-            sample=config["samples"],
         ),
         # mutserve:
         expand(
             "results/calls_{caller}/{reference}/{sample}.vcf.gz",
             caller="mutserve",
-            sample=config["samples"],
+            sample=samples,
             reference=config["reference"],
         ),
         expand(

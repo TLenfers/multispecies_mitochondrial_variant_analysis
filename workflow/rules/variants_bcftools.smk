@@ -13,7 +13,7 @@ rule call_variants:
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
     conda:
-        "workflow/envs/bcftools.yaml"
+        "envs/bcftools.yaml"
     log:
         "logs/{reference}/{sample}.bcftools.log",
     shell:
@@ -28,7 +28,7 @@ rule normalize_variants:
     output:
         "results/calls_bcftools/{reference}/norm_{sample}.vcf",
     conda:
-        "workflow/envs/bcftools.yaml"
+        "../envs/bcftools.yaml"
     log:
         "logs/{reference}/{sample}.log",
     shell:

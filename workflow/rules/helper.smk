@@ -5,7 +5,7 @@ rule zip_vcf:
     output:
         "results/calls_{caller}/{reference}/{sample}.vcf.gz",
     conda:
-        "workflow/envs/bcftools.yaml"
+        "../envs/bcftools.yaml"
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
     log:

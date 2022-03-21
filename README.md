@@ -53,7 +53,7 @@ cd multispecies_mitochondrial_variant_analysis
 snakemake -np
 
 # To run mutlipecies variant analysis
-snakemake -j n all --use-conda --use-singularity
+snakemake -j n all --use-conda 
 # where n is the numer of cores to use
 
 # To run human variant analysis with mutserve

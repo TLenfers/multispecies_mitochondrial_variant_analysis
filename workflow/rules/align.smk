@@ -10,7 +10,7 @@ rule bwa_mem:
     output:
         "results/mapped/{reference}/{sample}.bam",
     conda:
-        "workflow/envs/bwa.yaml"
+        "../envs/bwa.yaml"
     log:
         "logs/{reference}/{sample}.bwa.log",
     shell:
@@ -26,7 +26,7 @@ rule idx_bam:
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
     conda:
-        "workflow/envs/samtools.yaml"
+        "../envs/samtools.yaml"
     log:
         "logs/{reference}/{sample}.bam.bai.log",
     shell:
@@ -40,7 +40,7 @@ rule idx_fasta:
     output:
         "data/reference/{reference}.fa.fai",
     conda:
-        "workflow/envs/samtools.yaml"
+        "../envs/samtools.yaml"
     log:
         "logs/{reference}/idx_fasta.log",
     shell:

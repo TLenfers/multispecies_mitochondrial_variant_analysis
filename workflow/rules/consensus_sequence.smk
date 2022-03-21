@@ -8,11 +8,11 @@ rule prepare_for_seq:
         vcf="results/sequences/{caller}/{reference}/{sample}.vcf.gz",
         tbi="results/sequences/{caller}/{reference}/{sample}.vcf.gz.tbi",
     conda:
-        "workflow/envs/vcftools.yaml"
+        "../envs/vcftools.yaml"
     log:
         "logs/{caller}/{reference}/{sample}.prepare_for_seq.log",
     shell:
-        "vcftools --gzvcf {input.vcf} --remove-indels --minQ 200.0 --recode --recode-INFO-all --stdout |bgzip > {output.vcf}; tabix -p vcf {output.tbi}"
+        "vcftools --gzvcf {input.vcf} --remove-indels --minQ 200.0 --recode --recode-INFO-all --stdout |bgzip > {output.vcf}; tabix -p vcf {output.vcf}"
 
 
 # creates the consensus sequence
@@ -24,7 +24,7 @@ rule vcf_to_fasta:
     output:
         fa="results/sequences/{caller}/{reference}/{sample}.fa",
     conda:
-        "workflow/envs/bcftools.yaml"
+        "../envs/bcftools.yaml"
     log:
         "logs/vcf_to_fasta/{caller}/{reference}/{sample}.log",
     shell:

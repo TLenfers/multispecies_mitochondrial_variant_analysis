@@ -32,7 +32,7 @@ rule bwa_idx:
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
     conda:
-        "workflow/envs/bwa.yaml"
+        "../envs/bwa.yaml"
     log:
         "logs/{reference}/bwa_idx.log",
     shell:

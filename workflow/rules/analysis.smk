@@ -3,12 +3,12 @@ rule merge_vcf:
     input:
         expand(
             "results/calls_{{caller}}/{{reference}}/{sample}.vcf.gz",
-            sample=config["samples"],
+            sample=samples,
         ),
     output:
         "results/calls_{caller}/{reference}/merged.vcf",
     conda:
-        "workflow/envs/bcftools.yaml"
+        "../envs/bcftools.yaml"
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
     log:
@@ -22,13 +22,13 @@ rule common_variants:
     input:
         in_file="results/calls_{caller}/{reference}/merged.vcf",
     output:
-        "results/calls_{caller}/{reference}/commonVariants.tsv",
+        out="results/calls_{caller}/{reference}/commonVariants.tsv",
     conda:
-        "workflow/envs/r-heatmap.yaml"
+        "../envs/r-heatmap.yaml"
     log:
         "logs/calls_{caller}/{reference}/commonVariants.log",
     script:
-        "workflow/scripts/common_variants.R"
+        "../scripts/common_variants.R"
 
 
 # creates the heatmap plots for the common variants of dog and mouse data
@@ -41,8 +41,8 @@ rule plot_variant_heatmap:
         "results/plots/{caller}/{reference}/alt_heatmap.pdf",
         "results/plots/{caller}/{reference}/alt_heatmap_clusterrow.pdf",
     conda:
-        "workflow/envs/r-heatmap.yaml"
+        "../envs/r-heatmap.yaml"
     log:
         "logs/{caller}/{reference}/plot_variant_heatmap.log",
     script:
-        "workflow/scripts/plot_variant_heatmap.R"
+        "scripts/plot_variant_heatmap.R"

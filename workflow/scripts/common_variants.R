@@ -7,6 +7,6 @@ for (i in 1:length(x)){
   }
 }
 x <- x[chr:length(x)]
-fileConn <- file(snakemake@output[[1]], "w")
+fileConn <- file(snakemake@output[['out']], "w")
 writeLines(x,fileConn)
 close(fileConn)
