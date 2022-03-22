@@ -5,6 +5,7 @@
 
 # calls the variants using bcftools from the bam file
 # works only for human mitochondrial data
+# mutserve is not available in conda, therefore a container will be used
 rule mutserve:
     input:
         bam="results/mapped/{reference}/{sample}.bam",

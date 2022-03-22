@@ -1,16 +1,13 @@
-from snakemake.utils import min_version
 from pandas import read_table
+from pathlib import Path
+
 
 ##### setup config #####
 configfile: "../config/config.yaml"
-sample_file = "../"+config["sample_file"]
-samples = read_table(sample_file)['sample_name'].tolist()
-print(samples)
 
 
-# this container defines the underlying OS for each job when using the workflow
-# with --use-conda --use-singularity
-container: "docker://continuumio/miniconda3"
+sample_file = Path.joinpath(Path(".."), Path(config["sample_file"]))
+samples = read_table(sample_file)["sample_name"].tolist()
 
 
 ##### load rules #####

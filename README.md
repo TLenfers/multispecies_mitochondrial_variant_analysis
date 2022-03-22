@@ -24,7 +24,7 @@ conda config --add channels bioconda
 conda config --add channels conda-forge
 # create & activate new env with installed deps
 conda env create -n wf -f environment.yaml
-conda activate wf
+source activate wf
 ```
 ## Configuration
 **Config files**:
