@@ -1,5 +1,5 @@
 # Multispecies Mitochondrial Variant Analysis 
-
+ 
 This workflow performs a variant analysis on mitochondrial genomes using the bcftools variant caller.
 For human samples, the workflow also performs a variant analysis using mutserve.
 
