@@ -6,7 +6,7 @@ from pathlib import Path
 configfile: "config/config.yaml"
 
 
-#sample_file = Path.joinpath(Path(".."), Path(config["sample_file"]))
+# sample_file = Path.joinpath(Path(".."), Path(config["sample_file"]))
 sample_file = Path(config["sample_file"])
 samples = read_table(sample_file)["sample_name"].tolist()
 

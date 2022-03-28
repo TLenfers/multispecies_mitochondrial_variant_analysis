@@ -18,7 +18,7 @@ rule prepare_for_seq:
 # creates the consensus sequence
 rule vcf_to_fasta:
     input:
-        ref="{{reference_path}}/{reference}.fa",
+        ref=Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
         vcf="results/sequences/{caller}/{reference}/{sample}.vcf.gz",
         index="results/sequences/{caller}/{reference}/{sample}.vcf.gz.tbi",
     output:

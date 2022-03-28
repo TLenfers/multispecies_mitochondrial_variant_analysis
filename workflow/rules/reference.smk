@@ -1,9 +1,9 @@
 # downloading the mitochondrial reference genome for mouse, dog and human data
 rule get_ref:
     output:
-        "{{reference_path}}/{reference}.fa",
-    log:
-        "logs/{{reference_path}}/{reference}/get_ref.log",
+        Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
+    #log:
+    #    "logs/{{reference_path}}/{reference}/get_ref.log",
     run:
         if config["reference"] == "mouse":
             shell(
@@ -22,18 +22,18 @@ rule get_ref:
 # creates the index for the reference genome
 rule bwa_idx:
     input:
-        "{{reference_path}}/{reference}.fa",
+        Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
     output:
-        "{{reference_path}}/{reference}.fa.amb",
-        "{{reference_path}}/{reference}.fa.ann",
-        "{{reference_path}}/{reference}.fa.bwt",
-        "{{reference_path}}/{reference}.fa.pac",
-        "{{reference_path}}/{reference}.fa.sa",
+        Path.joinpath(Path(config["reference_path"]), "{reference}.fa.amb"),
+        Path.joinpath(Path(config["reference_path"]), "{reference}.fa.ann"),
+        Path.joinpath(Path(config["reference_path"]), "{reference}.fa.bwt"),
+        Path.joinpath(Path(config["reference_path"]), "{reference}.fa.pac"),
+        Path.joinpath(Path(config["reference_path"]), "{reference}.fa.sa"),
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
     conda:
         "../envs/bwa.yaml"
-    log:
-        "logs/{{reference_path}}/{reference}/bwa_idx.log",
+    #log:
+    #    "logs/{{reference_path}}/{reference}/bwa_idx.log",
     shell:
         "bwa index {input}"
