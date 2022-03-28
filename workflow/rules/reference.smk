@@ -3,7 +3,7 @@ rule get_ref:
     output:
         "{{reference_path}}/{reference}.fa",
     log:
-        "logs/{reference}/get_ref.log",
+        "logs/{{reference_path}}/{reference}/get_ref.log",
     run:
         if config["reference"] == "mouse":
             shell(
@@ -34,6 +34,6 @@ rule bwa_idx:
     conda:
         "../envs/bwa.yaml"
     log:
-        "logs/{reference}/bwa_idx.log",
+        "logs/{{reference_path}}/{reference}/bwa_idx.log",
     shell:
         "bwa index {input}"

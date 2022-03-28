@@ -42,6 +42,6 @@ rule idx_fasta:
     conda:
         "../envs/samtools.yaml"
     log:
-        "logs/{reference}/idx_fasta.log",
+        "logs/{{reference_path}}/{reference}/idx_fasta.log",
     shell:
         "samtools faidx {input}"
