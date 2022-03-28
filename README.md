@@ -36,7 +36,8 @@ source activate wf
 **Samples:**
 
   - Put all sample names in a single column in [`samples.tsv`](/config/samples.tsv).
-  - Put all sample files in `workflow/data/samples/`
+  - Add the data folder to [`config.yaml`](config/config.yaml) where all files to be analysed are located
+    - standard path is set to `data/` 
   - assumed naming convention:
     - sampleName_R1.fastq.gz
     - sampleName_R2.fastq.gz

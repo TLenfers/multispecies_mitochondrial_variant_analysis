@@ -1,4 +1,8 @@
 # path or URL to sample sheet (TSV format, columns: sample)
 sample_file: config/samples.tsv
+# path to samples
+data_path : data
 # species of the samples and reference genome (dog, human, mouse)
-reference: ""
+# reference file expected to be named as such: species.fa
+reference: "human"
+reference_path: "workflow/results/reference"

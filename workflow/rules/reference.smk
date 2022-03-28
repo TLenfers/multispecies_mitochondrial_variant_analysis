@@ -1,7 +1,7 @@
 # downloading the mitochondrial reference genome for mouse, dog and human data
 rule get_ref:
     output:
-        "data/reference/{reference}.fa",
+        "{{reference_path}}/{reference}.fa",
     log:
         "logs/{reference}/get_ref.log",
     run:
@@ -22,13 +22,13 @@ rule get_ref:
 # creates the index for the reference genome
 rule bwa_idx:
     input:
-        "data/reference/{reference}.fa",
+        "{{reference_path}}/{reference}.fa",
     output:
-        "data/reference/{reference}.fa.amb",
-        "data/reference/{reference}.fa.ann",
-        "data/reference/{reference}.fa.bwt",
-        "data/reference/{reference}.fa.pac",
-        "data/reference/{reference}.fa.sa",
+        "{{reference_path}}/{reference}.fa.amb",
+        "{{reference_path}}/{reference}.fa.ann",
+        "{{reference_path}}/{reference}.fa.bwt",
+        "{{reference_path}}/{reference}.fa.pac",
+        "{{reference_path}}/{reference}.fa.sa",
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
     conda:

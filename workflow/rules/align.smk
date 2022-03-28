@@ -1,10 +1,10 @@
 # mapping of the reads to the reference genome using Burrows-Wheeler Aligner
 rule bwa_mem:
     input:
-        amb="data/reference/{reference}.fa.amb",
-        ref="data/reference/{reference}.fa",
-        fastq_r1="data/samples/{sample}_R1.fastq.gz",
-        fastq_r2="data/samples/{sample}_R2.fastq.gz",
+        amb="{{reference_path}}/{reference}.fa.amb",
+        ref="{{reference_path}}/{reference}.fa",
+        fastq_r1="{{data_path}}/{sample}_R1.fastq.gz",
+        fastq_r2="{{data_path}}/{sample}_R2.fastq.gz",
     wildcard_constraints:
         reference="[A-Za-z0-9]+",
     output:
@@ -36,9 +36,9 @@ rule idx_bam:
 # creates index for the reference sequence in fasta format
 rule idx_fasta:
     input:
-        "data/reference/{reference}.fa",
+        "{{reference_path}}/{reference}.fa",
     output:
-        "data/reference/{reference}.fa.fai",
+        "{{reference_path}}/{reference}.fa.fai",
     conda:
         "../envs/samtools.yaml"
     log:

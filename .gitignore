@@ -157,7 +157,7 @@ cython_debug/
 # Built Visual Studio Code Extensions
 *.vsix
 
-workflow/data/reference/*
+workflow/{{reference_path}}/*
 workflow/data/samples/*
 !workflow/data/samples/readme_samples.md
 
@@ -167,3 +167,4 @@ workflow/results/*
 results/*
 .idea/
 config/config.yaml
+data/*

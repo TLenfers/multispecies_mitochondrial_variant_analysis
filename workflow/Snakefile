@@ -3,11 +3,16 @@ from pathlib import Path
 
 
 ##### setup config #####
-configfile: "../config/config.yaml"
+configfile: "config/config.yaml"
 
 
-sample_file = Path.joinpath(Path(".."), Path(config["sample_file"]))
+#sample_file = Path.joinpath(Path(".."), Path(config["sample_file"]))
+sample_file = Path(config["sample_file"])
 samples = read_table(sample_file)["sample_name"].tolist()
+
+data_path = Path(config["data_path"])
+
+reference_path = Path(config["reference_path"])
 
 
 ##### load rules #####
