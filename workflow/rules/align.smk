@@ -1,8 +1,8 @@
 # mapping of the reads to the reference genome using Burrows-Wheeler Aligner
 rule bwa_mem:
     input:
-        amb = Path.joinpath(Path(config["reference_path"]), "{reference}.fa.amb"),
-        ref = Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
+        amb=Path.joinpath(Path(config["reference_path"]), "{reference}.fa.amb"),
+        ref=Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
         fastq_r1=Path.joinpath(Path(config["data_path"]), "{sample}_R1.fastq.gz"),
         fastq_r2=Path.joinpath(Path(config["data_path"]), "{sample}_R2.fastq.gz"),
     wildcard_constraints:
@@ -36,12 +36,12 @@ rule idx_bam:
 # creates index for the reference sequence in fasta format
 rule idx_fasta:
     input:
-         Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
+        Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
     output:
-         Path.joinpath(Path(config["reference_path"]), "{reference}.fa.fai"),
+        Path.joinpath(Path(config["reference_path"]), "{reference}.fa.fai"),
     conda:
         "../envs/samtools.yaml"
-    #log:
-    #    "logs/{{reference_path}}/{reference}/idx_fasta.log",
+    log:
+        "logs/{reference}/idx_fasta.log",
     shell:
         "samtools faidx {input}"

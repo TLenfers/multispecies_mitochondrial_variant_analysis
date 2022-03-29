@@ -168,3 +168,4 @@ results/*
 .idea/
 config/config.yaml
 data/*
+workflow/report.html

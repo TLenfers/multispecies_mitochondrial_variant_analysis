@@ -10,8 +10,8 @@ rule mutserve:
     input:
         bam="results/mapped/{reference}/{sample}.bam",
         bamidx="results/mapped/{reference}/{sample}.bam.bai",
-        ref="{{reference_path}}/{reference}.fa",
-        index="{{reference_path}}/{reference}.fa.fai",
+        ref=Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
+        index=Path.joinpath(Path(config["reference_path"]), "{reference}.fa.fai"),
     output:
         "results/calls_mutserve/{reference}/{sample}.vcf",
     wildcard_constraints:

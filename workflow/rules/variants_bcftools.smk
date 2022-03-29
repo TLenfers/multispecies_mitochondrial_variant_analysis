@@ -6,8 +6,8 @@ rule call_variants:
     input:
         bam="results/mapped/{reference}/{sample}.bam",
         bamidx="results/mapped/{reference}/{sample}.bam.bai",
-        ref = Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
-        index = Path.joinpath(Path(config["reference_path"]), "{reference}.fa.fai"),
+        ref=Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
+        index=Path.joinpath(Path(config["reference_path"]), "{reference}.fa.fai"),
     output:
         "results/calls_bcftools/{reference}/{sample}.vcf",
     wildcard_constraints:
@@ -24,7 +24,7 @@ rule call_variants:
 rule normalize_variants:
     input:
         vcf="results/calls_bcftools/{reference}/{sample}.vcf.gz",
-        ref = Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
+        ref=Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
     output:
         "results/calls_bcftools/{reference}/norm_{sample}.vcf",
     conda:

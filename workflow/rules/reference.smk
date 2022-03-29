@@ -2,8 +2,8 @@
 rule get_ref:
     output:
         Path.joinpath(Path(config["reference_path"]), "{reference}.fa"),
-    #log:
-    #    "logs/{{reference_path}}/{reference}/get_ref.log",
+    log:
+        "logs/{reference}/get_ref.log",
     run:
         if config["reference"] == "mouse":
             shell(
@@ -33,7 +33,7 @@ rule bwa_idx:
         reference="[A-Za-z0-9]+",
     conda:
         "../envs/bwa.yaml"
-    #log:
-    #    "logs/{{reference_path}}/{reference}/bwa_idx.log",
+    log:
+        "logs/{reference}/bwa_idx.log",
     shell:
         "bwa index {input}"
