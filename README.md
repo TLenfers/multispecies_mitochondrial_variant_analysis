@@ -3,7 +3,7 @@
 This workflow performs a variant analysis on mitochondrial genomes using the bcftools variant caller.
 For human samples, the workflow also performs a variant analysis using mutserve.
 
-## Installation
+## Local installation
 1. Clone this repo
 ```bash
 git clone https://github.com/tlenfers/multispecies_mitochondrial_variant_analysis.git
@@ -47,8 +47,7 @@ source activate wf
 To analyse dog, mouse or human samples the corresponding reference will be downloaded.
 Define the to be analysed species in [`config.yaml`](/config/config.yaml) under reference.
 
-If you want to analyse a different species or use your own reference, enter the name of the file in [`config.yaml`](config/config.yaml).
-The reference file (name.fa) should be put in `workflow/data/reference`.
+If you want to analyse a different species or use your own reference, enter the name of the file and it's path in [`config.yaml`](config/config.yaml).
 
 ## Execute the workflow
 ```bash
@@ -67,7 +66,19 @@ snakemake -j n all_human --use-conda --use-singularity
 
 
 ## Output
-All output files are put in `/results` and in their own subfolder regarding the used reference and caller.
+All output files are put in `/results` and in their own subfolder regarding the used reference and caller.  
+The results are in a sub-folder corresponding to the name of the reference file used.  
+`/results/calls_bcftools` contains all called variants using bcftools  
+`/results/calls_mutserve` contains all called variants using mutserve  
+`/results/mapped` contains all aligned reads as `sample_name.bam`  
+`/results/plots` contains the created heatmap plots for the bctools caller
+`/results/sequences` contains the created consensus sequences for all samples in regard to the used reference
 
+## Snakedeploy usage
+The usage of this workflow is described in the [Snakemake Workflow Catalog](https://snakemake.github.io/snakemake-workflow-catalog?usage=TLenfers/multispecies_mitochondrial_variant_analysis).
+```bash
+# To run human variant analysis with mutserve
+snakemake --cores all all_human --use-conda --use-singularity 
+```
 
 If you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this (original) repository.
