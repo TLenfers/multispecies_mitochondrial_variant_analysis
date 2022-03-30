@@ -1,4 +1,5 @@
 # Multispecies Mitochondrial Variant Analysis 
+ [![Actions Status](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/workflows/Linting/badge.svg)](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/actions)
  
 This workflow performs a variant analysis on mitochondrial genomes using the bcftools variant caller.
 For human samples, the workflow also performs a variant analysis using mutserve.
