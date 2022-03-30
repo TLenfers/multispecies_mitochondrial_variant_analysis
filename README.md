@@ -65,7 +65,7 @@ snakemake -j n all --use-conda --use-singularity
 # To run human variant analysis with mutserve
 snakemake -j n all_human --use-conda --use-singularity
 # where n is the numer of cores to use
-```
+```m
 
 
 ## Output
@@ -81,8 +81,8 @@ The results are in a sub-folder corresponding to the name of the reference file 
 - `/results/calls_mutserve` contains all called variants using mutserve.
 - `/results/mapped` contains all aligned reads as `sample_name.bam` ad their index file `sample_name.bam.bai`. 
 - `/results/plots` contains the created heatmap plots for the bctools caller. Example plots:
-  - [ref_heatmap.pdf](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/files/8379593/ref_heatmap.pdf)
-  - [ref_heatmap_clusterrow.pdf](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/files/8379594/ref_heatmap_clusterrow.pdf)
+  - [ref_heatmap.pdf](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/files/8382839/ref_heatmap.pdf)
+  - [ref_heatmap_clusterrow.pdf](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/files/8382840/ref_heatmap_clusterrow.pdf)
   - The name of the samples is on the X-axis, the variants on the Y-axis
   - The values of the heatmap refer to the Phred-scaled likelihood for homomorphic reference allele (scale 0-255; 255: reference is very unlikely -> alternative more likely).
   - The plots of `alt_heatmap` are containing the Phred-scaled likelihood for homomorphic alternative allele, i.e. that the variant is present at this position (scale 0-255; 0: variant is present).
