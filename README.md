@@ -68,11 +68,22 @@ snakemake -j n all_human --use-conda --use-singularity
 ## Output
 All output files are put in `/results` and in their own subfolder regarding the used reference and caller.  
 The results are in a sub-folder corresponding to the name of the reference file used.  
-`/results/calls_bcftools` contains all called variants using bcftools  
-`/results/calls_mutserve` contains all called variants using mutserve  
-`/results/mapped` contains all aligned reads as `sample_name.bam`  
-`/results/plots` contains the created heatmap plots for the bctools caller
-`/results/sequences` contains the created consensus sequences for all samples in regard to the used reference
+- `/results/calls_bcftools` contains all called variants using bcftools. The variants are normalized and saved as `sample_name.vcf.gz`. In addition, the file `mergerd.vcf` is created in which all variants are merged together.
+  - Example file without header:
+```bash
+    #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	results/mapped/human/AGS-3xMOI25-CAD-1_S34.bam
+    chrM	73	.	A	G	225.417	.	DP=253;VDB=3.59147e-17;SGB=-0.693147;MQSBZ=0;FS=0;MQ0F=0;AC=1;AN=1;DP4=0,0,240,5;MQ=60	GT:PL	1:255,0
+    chrM	146	.	T	C	225.422	.	DP=242;VDB=0.795672;SGB=-0.693147;MQSBZ=0;FS=0;MQ0F=0;AC=1;AN=1;DP4=0,0,165,52;MQ=60	GT:PL	1:255,0
+```    
+- `/results/calls_mutserve` contains all called variants using mutserve.
+- `/results/mapped` contains all aligned reads as `sample_name.bam` ad their index file `sample_name.bam.bai`. 
+- `/results/plots` contains the created heatmap plots for the bctools caller. Example plots:
+  - [ref_heatmap.pdf](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/files/8379593/ref_heatmap.pdf)
+  - [ref_heatmap_clusterrow.pdf](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/files/8379594/ref_heatmap_clusterrow.pdf)
+  - The name of the samples is on the X-axis, the variants on the Y-axis
+  - The values of the heatmap refer to the Phred-scaled likelihood for homomorphic reference allele (scale 0-255; 255: reference is very unlikely -> alternative more likely).
+  - The plots of `alt_heatmap` are containing the Phred-scaled likelihood for homomorphic alternative allele, i.e. that the variant is present at this position (scale 0-255; 0: variant is present).
+- `/results/sequences` contains the created consensus sequences for each sample in regard to the used reference in fasta format as `sample_name.fa`.
 
 ## Snakedeploy usage
 The usage of this workflow is described in the [Snakemake Workflow Catalog](https://snakemake.github.io/snakemake-workflow-catalog?usage=TLenfers/multispecies_mitochondrial_variant_analysis).
@@ -82,3 +93,4 @@ snakemake --cores all all_human --use-conda --use-singularity
 ```
 
 If you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this (original) repository.
+
