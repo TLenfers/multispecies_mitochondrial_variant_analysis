@@ -71,7 +71,7 @@ The results are in a sub-folder corresponding to the name of the reference file 
 - `/results/calls_bcftools` contains all called variants using bcftools. The variants are normalized and saved as `sample_name.vcf.gz`. In addition, the file `mergerd.vcf` is created in which all variants are merged together.
   - Example file without header:
 ```bash
-    #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	results/mapped/human/AGS-3xMOI25-CAD-1_S34.bam
+    #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	results/mapped/human/sample_name.bam
     chrM	73	.	A	G	225.417	.	DP=253;VDB=3.59147e-17;SGB=-0.693147;MQSBZ=0;FS=0;MQ0F=0;AC=1;AN=1;DP4=0,0,240,5;MQ=60	GT:PL	1:255,0
     chrM	146	.	T	C	225.422	.	DP=242;VDB=0.795672;SGB=-0.693147;MQSBZ=0;FS=0;MQ0F=0;AC=1;AN=1;DP4=0,0,165,52;MQ=60	GT:PL	1:255,0
 ```    
