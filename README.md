@@ -2,7 +2,7 @@
  [![Actions Status](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/workflows/Linting/badge.svg)](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/actions) 
  
 This workflow performs a variant analysis on mitochondrial genomes using the bcftools variant caller.
-For human samples, the workflow also performs a variant analysis using mutserve. It is listed in the [Snakemake Workflow Catalog](https://snakemake.github.io/snakemake-workflow-catalog?usage=TLenfers/multispecies_mitochondrial_variant_analysis)
+For human samples, the workflow also performs a variant analysis using mutserve. It is listed in the [Snakemake Workflow Catalog](https://snakemake.github.io/snakemake-workflow-catalog?usage=TLenfers/multispecies_mitochondrial_variant_analysis) where usage of standardized Snakemake workflows is described.
  
 ![mt_analyses](https://user-images.githubusercontent.com/14835042/160993253-1d3b1392-fe7e-4933-b105-d8e5036b8f48.png)
  
