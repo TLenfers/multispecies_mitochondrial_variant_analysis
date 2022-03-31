@@ -97,3 +97,16 @@ snakemake --cores all all_human --use-conda --use-singularity
 
 If you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this (original) repository.
 
+
+## Planned features
+This pipeline is work in progress. The following features are planned:
+
+- mutserve caller:
+  - extraction of common variants
+  - plotting variant heatmaps based on variants called by mutserve
+  - building the consensus sequence
+- additional quality control strep:
+  - remove samples with low coverage from further analysis
+- dynamic sizing of the heatmap based on samples and variants
+
+
