@@ -1,8 +1,8 @@
 # Multispecies Mitochondrial Variant Analysis 
- [![Actions Status](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/workflows/Linting/badge.svg)](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/actions)
+ [![Actions Status](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/workflows/Linting/badge.svg)](https://github.com/TLenfers/multispecies_mitochondrial_variant_analysis/actions), you may also see there for details on usage of standardized Snakemake workflows.
  
 This workflow performs a variant analysis on mitochondrial genomes using the bcftools variant caller.
-For human samples, the workflow also performs a variant analysis using mutserve.
+For human samples, the workflow also performs a variant analysis using mutserve. It is listed in the [Snakemake Workflow Catalog](https://snakemake.github.io/snakemake-workflow-catalog?usage=TLenfers/multispecies_mitochondrial_variant_analysis)
  
 ![mt_analyses](https://user-images.githubusercontent.com/14835042/160993253-1d3b1392-fe7e-4933-b105-d8e5036b8f48.png)
  
@@ -65,7 +65,7 @@ snakemake -j n all --use-conda --use-singularity
 # To run human variant analysis with mutserve
 snakemake -j n all_human --use-conda --use-singularity
 # where n is the numer of cores to use
-```m
+```
 
 
 ## Output
@@ -77,7 +77,7 @@ The results are in a sub-folder corresponding to the name of the reference file 
     #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	results/mapped/human/sample_name.bam
     chrM	73	.	A	G	225.417	.	DP=253;VDB=3.59147e-17;SGB=-0.693147;MQSBZ=0;FS=0;MQ0F=0;AC=1;AN=1;DP4=0,0,240,5;MQ=60	GT:PL	1:255,0
     chrM	146	.	T	C	225.422	.	DP=242;VDB=0.795672;SGB=-0.693147;MQSBZ=0;FS=0;MQ0F=0;AC=1;AN=1;DP4=0,0,165,52;MQ=60	GT:PL	1:255,0
-```    
+```   
 - `/results/calls_mutserve` contains all called variants using mutserve.
 - `/results/mapped` contains all aligned reads as `sample_name.bam` ad their index file `sample_name.bam.bai`. 
 - `/results/plots` contains the created heatmap plots for the bctools caller. Example plots:
