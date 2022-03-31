@@ -4,8 +4,8 @@
 This workflow performs a variant analysis on mitochondrial genomes using the bcftools variant caller.
 For human samples, the workflow also performs a variant analysis using mutserve.
  
-![mt_analyses](https://user-images.githubusercontent.com/14835042/160881351-98898821-e286-49ea-9f10-6547a1798ecd.png) 
-
+![mt_analyses](https://user-images.githubusercontent.com/14835042/160993253-1d3b1392-fe7e-4933-b105-d8e5036b8f48.png)
+ 
 ## Local installation
 1. Clone this repo
 ```bash
