@@ -53,6 +53,8 @@ variants <- as.matrix(variants)
 my.breaks <- c(seq(0,255, by=25)) 
 my.colors <- c(colorRampPalette(colors = c("red","grey","white"))(length(my.breaks)))
 
+plt_size <- 7
+
 # heatmap with dendograms only for samples
 pdf(out_file_1,         # File name
     width = 8, height = 7, # Width and height in inches
@@ -62,11 +64,11 @@ print(head(variants))
 pheatmap(variants,
          cluster_rows = FALSE,
          legend=TRUE,
-         cellwidth = 7,
-         cellheight = 7,
-         fontsize_row = 7,
-         fontsize_col = 7,
-         fontsize = 7,
+         cellwidth = plt_size,
+         cellheight = plt_size,
+         fontsize_row = plt_size,
+         fontsize_col = plt_size,
+         fontsize = plt_size,
          color=my.colors,
          breaks=my.breaks,
          )
@@ -80,11 +82,12 @@ pdf(out_file_2,         # File name
     paper = "A4")     
 pheatmap(variants,
          cluster_rows =TRUE,
-         legend=TRUE,cellwidth = 7,
-         cellheight = 7,
-         fontsize_row = 7,
-         fontsize_col = 7,
-         fontsize = 7,
+         legend=TRUE,
+         cellwidth = plt_size,
+         cellheight = plt_size,
+         fontsize_row = plt_size,
+         fontsize_col = plt_size,
+         fontsize = plt_size,
          color=my.colors,
          breaks=my.breaks
          )
@@ -107,11 +110,11 @@ pdf(out_file_3,         # File name
     paper = "A4")
 pheatmap(alt_variants,         cluster_rows = FALSE,
          legend=TRUE,
-         cellwidth = 7,
-         cellheight = 7,
-         fontsize_row = 7,
-         fontsize_col = 7,
-         fontsize = 7,
+         cellwidth = plt_size,
+         cellheight = plt_size,
+         fontsize_row = plt_size,
+         fontsize_col = plt_size,
+         fontsize = plt_size,
          color=my.colors,
          breaks=my.breaks,
 )
@@ -126,11 +129,12 @@ pdf(out_file_4,         # File name
 print(head(alt_variants))
 pheatmap(alt_variants,
                 cluster_rows =TRUE,
-                legend=TRUE,cellwidth = 7,
-                cellheight = 7,
-                fontsize_row = 7,
-                fontsize_col = 7,
-                fontsize = 7,
+                legend=TRUE,
+                cellwidth = plt_size,
+                cellheight = plt_size,
+                fontsize_row = plt_size,
+                fontsize_col = plt_size,
+                fontsize = plt_size,
                 color=my.colors,
                 breaks=my.breaks
 )
