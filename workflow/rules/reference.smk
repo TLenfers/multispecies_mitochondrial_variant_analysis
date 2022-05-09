@@ -11,7 +11,7 @@ rule get_ref:
             )
         if config["reference"] == "dog":
             shell(
-                "wget -O- https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id=U96639.2&db=nuccore&report=fasta > {output}"
+                "wget -O- 'https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id=U96639.2&db=nuccore&report=fasta' > {output}"
             )
         if config["reference"] == "human":
             shell(
